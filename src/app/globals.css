@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+/*
+ * BuyNest Admin design tokens. Every colour in the app comes from here and is used through
+ * semantic classes (bg-surface, text-muted, border-line, bg-success-soft, ...), so the look
+ * can change in one place. The palette follows the customer app's teal brand.
+ */
+@theme {
+  --color-bg: #f6f8f7;
+  --color-surface: #ffffff;
+  --color-line: #e1e7e4;
+  --color-fg: #14201d;
+  --color-muted: #5b6b66;
+
+  --color-primary: #0f766e;
+  --color-primary-hover: #0b5f58;
+  --color-primary-soft: #d9f0ec;
+  --color-on-primary: #ffffff;
+
+  --color-success: #15803d;
+  --color-success-soft: #dcfce7;
+  --color-warning: #b45309;
+  --color-warning-soft: #fef3c7;
+  --color-danger: #b91c1c;
+  --color-danger-soft: #fee2e2;
+  --color-info: #1d4ed8;
+  --color-info-soft: #dbeafe;
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* A clearly visible keyboard focus ring on everything interactive. */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* The native <dialog> backdrop. */
+dialog::backdrop {
+  background: rgb(20 32 29 / 0.45);
+}
