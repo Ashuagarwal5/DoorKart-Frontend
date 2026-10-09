@@ -1,5 +1,5 @@
 /**
- * Shapes of the BuyNest Admin API responses, written from the backend's own code
+ * Shapes of the DoorKart Admin API responses, written from the backend's own code
  * (Backend/src/modules/admin). The backend lives in another project and is the authority:
  * if a response changes there, change it here. All amounts are integer paise.
  * Dates are ISO 8601 strings in UTC.
@@ -292,3 +292,28 @@ export type CustomerDetail = Customer & {
 };
 
 export type CustomerListFilters = { page?: number; limit?: number; search?: string };
+
+// ---- Settings (super admin only) -------------------------------------------------------
+
+export type SettingView = {
+  key: string;
+  label: string;
+  description: string | null;
+  placeholder: string | null;
+  type: 'text' | 'email' | 'number' | 'boolean' | 'password';
+  /** A secret's value is never sent to the panel: only whether one is saved. */
+  secret: boolean;
+  value: string | null;
+  isSet: boolean;
+  min: number | null;
+  max: number | null;
+};
+
+export type SettingsView = {
+  /** False when the server has no SECRETS_KEY, so a secret cannot be saved yet. */
+  secretsKeyConfigured: boolean;
+  groups: { id: 'email' | 'google' | 'signin'; title: string; description: string; settings: SettingView[] }[];
+};
+
+/** key to new value. null removes the saved value; a key left out is not changed. */
+export type SettingsChanges = Record<string, string | null>;

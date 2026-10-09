@@ -39,7 +39,7 @@ export function ProductsPage() {
     categoryId: url.get('categoryId') || undefined,
     isActive: status === 'active' ? true : status === 'inactive' ? false : undefined,
   };
-  const query = useApiQuery(`products:${JSON.stringify(filters)}`, (signal) => fetchProducts(filters, signal));
+  const query = useApiQuery(`products:${JSON.stringify(filters)}`, () => fetchProducts(filters));
   const categories = useApiQuery('categories', fetchCategories);
   const hasFilters = Boolean(filters.search || filters.categoryId || status);
 

@@ -38,15 +38,17 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   // Restore the session on load (and again after a retry).
   useEffect(() => {
-    const controller = new AbortController();
-    fetchMe(controller.signal).then(
+    // The "who am I" check is one small request, so it is not cancelled when this effect is
+    // cleaned up (React does that on purpose in development); its answer is just ignored.
+    let isStale = false;
+    fetchMe().then(
       ({ admin }) => {
-        if (!controller.signal.aborted) {
+        if (!isStale) {
           setState({ status: 'authenticated', admin });
         }
       },
       (error: unknown) => {
-        if (controller.signal.aborted) {
+        if (isStale) {
           return;
         }
         // Being signed out is the normal answer here, not an expiry. But if the server could
@@ -60,7 +62,9 @@ export function AuthProvider({ children }: PropsWithChildren) {
         );
       }
     );
-    return () => controller.abort();
+    return () => {
+      isStale = true;
+    };
   }, [attempt]);
 
   const retry = useCallback(() => {

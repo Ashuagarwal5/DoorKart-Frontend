@@ -34,7 +34,7 @@ const ORDER_COLUMNS: Column<RecentOrder>[] = [
 
 export function CustomerDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const query = useApiQuery(`customer:${id}`, (signal) => fetchCustomer(id, signal));
+  const query = useApiQuery(`customer:${id}`, () => fetchCustomer(id));
 
   return (
     <QueryView

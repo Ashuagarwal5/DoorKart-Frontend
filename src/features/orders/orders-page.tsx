@@ -23,6 +23,7 @@ import {
   PAYMENT_STATUSES,
   type PaymentStatus,
 } from '@/types/api';
+import { cn } from '@/utils/cn';
 import { formatDateTime } from '@/utils/date';
 import { formatCurrency } from '@/utils/money';
 
@@ -52,6 +53,7 @@ const COLUMNS: Column<OrderListItem>[] = [
     key: 'actions',
     header: 'Actions',
     align: 'right',
+    hideOnCard: true,
     cell: (order) => (
       <Link href={`/orders/${order.id}`} className="text-sm text-primary hover:underline">
         View
@@ -79,12 +81,33 @@ export function OrdersPage() {
     from: DAY_PATTERN.test(url.get('from')) ? url.get('from') : undefined,
     to: DAY_PATTERN.test(url.get('to')) ? url.get('to') : undefined,
   };
-  const query = useApiQuery(`orders:${JSON.stringify(filters)}`, (signal) => fetchOrders(filters, signal));
+  const query = useApiQuery(`orders:${JSON.stringify(filters)}`, () => fetchOrders(filters));
   const hasFilters = Boolean(filters.status || filters.paymentStatus || filters.search || filters.from || filters.to);
 
   return (
     <>
       <PageHeader title="Orders" description="Every order placed in the app." />
+
+      <div role="group" aria-label="Filter by order status" className="mb-4 flex gap-2 overflow-x-auto pb-1">
+        {[undefined, ...ORDER_STATUSES].map((status) => {
+          const isSelected = filters.status === status;
+          return (
+            <button
+              key={status ?? 'all'}
+              type="button"
+              aria-pressed={isSelected}
+              onClick={() => url.set({ status: status ?? '' })}
+              className={cn(
+                'shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors',
+                isSelected
+                  ? 'border-primary bg-primary text-on-primary'
+                  : 'border-line bg-surface text-muted hover:border-primary hover:text-fg'
+              )}>
+              {status ? ORDER_STATUS_LABEL[status] : 'All orders'}
+            </button>
+          );
+        })}
+      </div>
 
       <div className="mb-4 flex flex-wrap items-end gap-3">
         <SearchInput
@@ -94,18 +117,6 @@ export function OrdersPage() {
           defaultValue={filters.search ?? ''}
           onSearch={(search) => url.set({ search }, { replace: true })}
         />
-        <SelectField
-          label="Status"
-          fieldClassName="w-44"
-          value={filters.status ?? ''}
-          onChange={(event) => url.set({ status: event.target.value })}>
-          <option value="">All</option>
-          {ORDER_STATUSES.map((status) => (
-            <option key={status} value={status}>
-              {ORDER_STATUS_LABEL[status]}
-            </option>
-          ))}
-        </SelectField>
         <SelectField
           label="Payment"
           fieldClassName="w-36"

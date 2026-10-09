@@ -44,7 +44,7 @@ export function CustomersPage() {
     limit: PAGE_SIZE,
     search: url.get('search') || undefined,
   };
-  const query = useApiQuery(`customers:${JSON.stringify(filters)}`, (signal) => fetchCustomers(filters, signal));
+  const query = useApiQuery(`customers:${JSON.stringify(filters)}`, () => fetchCustomers(filters));
   const hasSearch = Boolean(filters.search);
 
   return (

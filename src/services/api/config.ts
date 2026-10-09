@@ -1,5 +1,5 @@
 /**
- * Where the BuyNest backend is. The browser calls it directly (the sign-in cookie belongs
+ * Where the DoorKart backend is. The browser calls it directly (the sign-in cookie belongs
  * to the backend's origin, so the Next.js server could never forward it), which means this
  * must be an address the BROWSER can reach, and the backend's CORS_ORIGINS must list this
  * app's own address.

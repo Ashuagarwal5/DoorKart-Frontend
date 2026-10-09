@@ -16,13 +16,15 @@ export type ApiQuery<T> =
  *
  * `key` identifies WHAT is loaded (the endpoint plus its filters): when it changes the old
  * data is dropped and the new data loads. `reload()` fetches again and keeps the data on
- * screen meanwhile (`isRefreshing`). A request is cancelled when the page goes away or the
- * key changes, so a slow old answer can never overwrite a newer one.
+ * screen meanwhile (`isRefreshing`). The answer to a request is ignored when the page goes away or the
+ * key changes, so a slow old answer can never overwrite a newer one. (The request itself is
+ * left to finish rather than cancelled: cancelling makes the browser raise AbortError noise
+ * in development, and these requests are small.)
  *
  * This is deliberately small. There is no shared cache: every page asks the server when it
  * opens, so what an admin sees is always what the server has.
  */
-export function useApiQuery<T>(key: string, load: (signal: AbortSignal) => Promise<T>): ApiQuery<T> {
+export function useApiQuery<T>(key: string, load: () => Promise<T>): ApiQuery<T> {
   const [attempt, setAttempt] = useState(0);
   const [settled, setSettled] = useState<Settled<T> | null>(null);
 
@@ -30,16 +32,16 @@ export function useApiQuery<T>(key: string, load: (signal: AbortSignal) => Promi
   const runLoad = useEffectEvent(load);
 
   useEffect(() => {
-    const controller = new AbortController();
+    let isStale = false;
 
-    runLoad(controller.signal).then(
+    runLoad().then(
       (data) => {
-        if (!controller.signal.aborted) {
+        if (!isStale) {
           setSettled({ key, attempt, outcome: { ok: true, data } });
         }
       },
       (error: unknown) => {
-        if (!controller.signal.aborted) {
+        if (!isStale) {
           const apiError =
             error instanceof ApiError ? error : new ApiError('SERVER_ERROR', 'Something went wrong.');
           setSettled({ key, attempt, outcome: { ok: false, error: apiError } });
@@ -47,7 +49,9 @@ export function useApiQuery<T>(key: string, load: (signal: AbortSignal) => Promi
       }
     );
 
-    return () => controller.abort();
+    return () => {
+      isStale = true;
+    };
   }, [key, attempt]);
 
   const reload = useCallback(() => setAttempt((current) => current + 1), []);

@@ -20,7 +20,7 @@ export function Card({ title, action, children, className }: { title?: string; a
 export function DetailRow({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-4">
-      <dt className="w-44 shrink-0 text-sm text-muted">{label}</dt>
+      <dt className="w-28 shrink-0 text-sm text-muted">{label}</dt>
       <dd className="min-w-0 break-words text-sm text-fg">{children}</dd>
     </div>
   );

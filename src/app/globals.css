@@ -1,21 +1,23 @@
 @import "tailwindcss";
 
 /*
- * BuyNest Admin design tokens. Every colour in the app comes from here and is used through
+ * DoorKart Admin design tokens. Every colour in the app comes from here and is used through
  * semantic classes (bg-surface, text-muted, border-line, bg-success-soft, ...), so the look
- * can change in one place. The palette follows the customer app's teal brand.
+ * can change in one place. The palette follows the DoorKart logo: blue as the main colour, orange as the accent.
  */
 @theme {
-  --color-bg: #f6f8f7;
+  --color-bg: #f5f7fb;
   --color-surface: #ffffff;
-  --color-line: #e1e7e4;
-  --color-fg: #14201d;
-  --color-muted: #5b6b66;
+  --color-line: #e1e6f0;
+  --color-fg: #0f1b33;
+  --color-muted: #55627a;
 
-  --color-primary: #0f766e;
-  --color-primary-hover: #0b5f58;
-  --color-primary-soft: #d9f0ec;
+  --color-primary: #0b57c9;
+  --color-primary-hover: #0a46a3;
+  --color-primary-soft: #dce9fb;
   --color-on-primary: #ffffff;
+
+  --color-accent: #ea580c;
 
   --color-success: #15803d;
   --color-success-soft: #dcfce7;
@@ -49,5 +51,5 @@ body {
 
 /* The native <dialog> backdrop. */
 dialog::backdrop {
-  background: rgb(20 32 29 / 0.45);
+  background: rgb(15 27 51 / 0.45);
 }

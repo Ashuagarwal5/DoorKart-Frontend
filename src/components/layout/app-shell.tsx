@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icons';
 import { useAdmin } from '@/features/auth/auth-context';
 import { useSignOut } from '@/features/auth/use-sign-out';
+import { useNewOrderCount } from '@/hooks/use-new-order-count';
 import { cn } from '@/utils/cn';
 
 const ROLE_LABEL = { SUPER_ADMIN: 'Super admin', ADMIN: 'Admin' } as const;
@@ -22,6 +23,7 @@ export function AppShell({ children }: PropsWithChildren) {
   const admin = useAdmin();
   const { signOut, isSigningOut } = useSignOut();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const newOrders = useNewOrderCount(pathname);
 
   const nav = (
     <nav aria-label="Main" className="flex-1 space-y-1 overflow-y-auto p-3">
@@ -39,6 +41,13 @@ export function AppShell({ children }: PropsWithChildren) {
             )}>
             <Icon name={item.icon} />
             {item.label}
+            {item.href === '/orders' && newOrders > 0 ? (
+              <span
+                aria-label={`${newOrders} new ${newOrders === 1 ? 'order' : 'orders'} waiting`}
+                className="ml-auto min-w-6 rounded-full bg-accent px-2 py-0.5 text-center text-xs font-semibold text-white">
+                {newOrders}
+              </span>
+            ) : null}
           </Link>
         );
       })}
@@ -48,7 +57,9 @@ export function AppShell({ children }: PropsWithChildren) {
   const sidebar = (
     <div className="flex h-full flex-col bg-surface">
       <div className="flex h-14 items-center gap-2 border-b border-line px-5">
-        <span className="text-lg font-bold text-primary">BuyNest</span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo-mark.png" alt="" className="h-8 w-8 rounded-md" />
+        <span className="text-lg font-bold text-primary">DoorKart</span>
         <span className="rounded bg-primary-soft px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary">
           Admin
         </span>
@@ -67,9 +78,9 @@ export function AppShell({ children }: PropsWithChildren) {
   );
 
   return (
-    <div className="min-h-screen lg:pl-64">
+    <div className="min-h-screen lg:pl-64 print:pl-0">
       {/* Desktop: always visible. */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-line lg:block">{sidebar}</aside>
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-line lg:block print:hidden">{sidebar}</aside>
 
       {/* Tablet and phone: a drawer over the page. */}
       {isDrawerOpen ? (
@@ -92,7 +103,7 @@ export function AppShell({ children }: PropsWithChildren) {
         </div>
       ) : null}
 
-      <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-line bg-surface px-4 lg:hidden">
+      <header className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-line bg-surface px-4 lg:hidden print:hidden">
         <button
           type="button"
           aria-label="Open menu"
@@ -101,7 +112,9 @@ export function AppShell({ children }: PropsWithChildren) {
           className="rounded-md p-2 text-muted hover:bg-bg hover:text-fg">
           <Icon name="menu" />
         </button>
-        <span className="font-bold text-primary">BuyNest</span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo-mark.png" alt="" className="h-7 w-7 rounded-md" />
+        <span className="font-bold text-primary">DoorKart</span>
         <span className="text-sm text-muted">Admin</span>
       </header>
 

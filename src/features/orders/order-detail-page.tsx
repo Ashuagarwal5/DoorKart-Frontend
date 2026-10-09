@@ -5,11 +5,14 @@ import { useParams } from 'next/navigation';
 
 import { Card, DetailRow } from '@/components/ui/card';
 import { DataTable, type Column } from '@/components/ui/data-table';
+import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/ui/page-header';
 import { QueryView, TableSkeleton } from '@/components/ui/states';
 import { OrderStatusBadge, PaymentStatusBadge } from '@/components/ui/status-badge';
 import { ORDER_STATUS_LABEL } from '@/constants/status';
 import { CollectCashAction, OrderActions } from '@/features/orders/order-actions';
+import { CustomerContact } from '@/features/orders/customer-contact';
+import { OrderProgress } from '@/features/orders/order-progress';
 import { useApiQuery } from '@/hooks/use-api-query';
 import { fetchOrder } from '@/services/api/admin-api';
 import type { OrderDetail } from '@/types/api';
@@ -36,7 +39,7 @@ const ITEM_COLUMNS: Column<Item>[] = [
 
 export function OrderDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const query = useApiQuery(`order:${id}`, (signal) => fetchOrder(id, signal));
+  const query = useApiQuery(`order:${id}`, () => fetchOrder(id));
 
   return (
     <QueryView
@@ -66,13 +69,20 @@ function OrderDetailContent({ order, reload }: { order: OrderDetail; reload: () 
           <>
             <OrderStatusBadge status={order.orderStatus} />
             <PaymentStatusBadge status={order.paymentStatus} />
+            <Button size="sm" className="print:hidden" onClick={() => window.print()}>
+              Print packing slip
+            </Button>
           </>
         }
       />
 
+      <div className="mb-6 rounded-xl border border-line bg-surface px-4 py-5 sm:px-6">
+        <OrderProgress status={order.orderStatus} />
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
-          <Card title="Update order">
+          <Card title="Update order" className="print:hidden">
             <OrderActions order={order} onChanged={reload} />
           </Card>
 
@@ -98,7 +108,7 @@ function OrderDetailContent({ order, reload }: { order: OrderDetail; reload: () 
             </dl>
           </Card>
 
-          <Card title="Status history">
+          <Card title="Status history" className="print:hidden">
             <ol className="space-y-4">
               {order.statusHistory.map((entry, index) => (
                 <li key={`${entry.status}-${entry.createdAt}-${index}`} className="flex gap-3">
@@ -161,6 +171,7 @@ function OrderDetailContent({ order, reload }: { order: OrderDetail; reload: () 
               </DetailRow>
               <DetailRow label="Phone">{order.customerPhone}</DetailRow>
             </dl>
+            <CustomerContact order={order} />
           </Card>
 
           <Card title="Delivery address">

@@ -31,7 +31,7 @@ export function InventoryPage() {
     search: url.get('search') || undefined,
     lowStock: lowStockOnly ? true : undefined,
   };
-  const query = useApiQuery(`inventory:${JSON.stringify(filters)}`, (signal) => fetchProducts(filters, signal));
+  const query = useApiQuery(`inventory:${JSON.stringify(filters)}`, () => fetchProducts(filters));
   const hasFilters = Boolean(filters.search || lowStockOnly);
 
   const columns: Column<Product>[] = [

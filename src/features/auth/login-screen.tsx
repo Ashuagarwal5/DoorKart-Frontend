@@ -83,7 +83,9 @@ export function LoginScreen() {
     <main className="flex min-h-screen items-center justify-center px-4 py-10">
       <div className="w-full max-w-sm">
         <div className="mb-6 text-center">
-          <h1 className="text-2xl font-bold text-primary">BuyNest</h1>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-mark.png" alt="" className="mx-auto mb-3 h-16 w-16 rounded-xl" />
+          <h1 className="text-2xl font-bold text-primary">DoorKart</h1>
           <p className="mt-1 text-sm text-muted">Shop admin sign in</p>
         </div>
 

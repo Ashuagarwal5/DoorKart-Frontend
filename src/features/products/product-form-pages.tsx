@@ -21,7 +21,7 @@ export function NewProductPage() {
 
 export function EditProductPage() {
   const { id } = useParams<{ id: string }>();
-  const product = useApiQuery(`product:${id}`, (signal) => fetchProduct(id, signal));
+  const product = useApiQuery(`product:${id}`, () => fetchProduct(id));
   const categories = useApiQuery('categories', fetchCategories);
 
   return (

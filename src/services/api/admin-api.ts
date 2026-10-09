@@ -21,6 +21,8 @@ import type {
   ProductCreateInput,
   ProductListFilters,
   ProductUpdateInput,
+  SettingsChanges,
+  SettingsView,
   UploadedMedia,
 } from '@/types/api';
 
@@ -127,3 +129,14 @@ export const fetchCustomers = (filters: CustomerListFilters, signal?: AbortSigna
 
 export const fetchCustomer = (id: string, signal?: AbortSignal) =>
   apiRequest<CustomerDetail>(`/customers/${encodeURIComponent(id)}`, { signal });
+
+// ---- Settings (super admin only) ------------------------------------------------------
+
+export const fetchSettings = (signal?: AbortSignal) => apiRequest<SettingsView>('/settings', { signal });
+
+export const saveSettings = (changes: SettingsChanges) =>
+  apiRequest<SettingsView>('/settings', { method: 'PATCH', body: { changes } });
+
+/** Sends a test email with the SAVED email settings. A failure carries a safe explanation. */
+export const sendTestEmail = (to?: string) =>
+  apiRequest<{ sentTo: string }>('/settings/email/test', { method: 'POST', body: to ? { to } : {}, timeoutMs: 30_000 });

@@ -6,8 +6,8 @@ import { AuthProvider } from '@/features/auth/auth-context';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: { default: 'BuyNest Admin', template: '%s · BuyNest Admin' },
-  description: 'BuyNest shop administration',
+  title: { default: 'DoorKart Admin', template: '%s · DoorKart Admin' },
+  description: 'DoorKart shop administration',
   // An internal tool: it should never appear in search results.
   robots: { index: false, follow: false },
 };

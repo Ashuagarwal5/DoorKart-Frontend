@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, DetailRow } from '@/components/ui/card';
 import { PageHeader } from '@/components/ui/page-header';
 import { useAdmin } from '@/features/auth/auth-context';
+import { AppSettings } from '@/features/settings/app-settings';
 import { useSignOut } from '@/features/auth/use-sign-out';
 import { API_BASE_URL } from '@/services/api/config';
 
@@ -22,6 +23,8 @@ export function SettingsPage() {
       <PageHeader title="Settings" />
 
       <div className="max-w-2xl space-y-6">
+        <AppSettings />
+
         <Card title="Signed in as">
           <dl className="space-y-3">
             <DetailRow label="Name">{admin.name}</DetailRow>
