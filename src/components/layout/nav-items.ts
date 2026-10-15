@@ -8,7 +8,10 @@ export const NAV_ITEMS: { href: string; label: string; icon: IconName }[] = [
   { href: '/categories', label: 'Categories', icon: 'categories' },
   { href: '/inventory', label: 'Inventory', icon: 'inventory' },
   { href: '/customers', label: 'Customers', icon: 'customers' },
+  { href: '/reviews', label: 'Reviews', icon: 'orders' },
+  { href: '/returns', label: 'Returns & refunds', icon: 'orders' },
   { href: '/delivery-areas', label: 'Delivery Areas', icon: 'delivery' },
+  { href: '/notifications', label: 'Notifications', icon: 'bell' },
   { href: '/settings', label: 'Settings', icon: 'settings' },
 ];
 

@@ -1,5 +1,7 @@
 'use client';
 
+import { OrderReturnsPanel } from '@/features/returns/order-returns';
+
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
@@ -27,7 +29,7 @@ const ITEM_COLUMNS: Column<Item>[] = [
     header: 'Product',
     cell: (item) => (
       <div>
-        <p className="font-medium text-fg">{item.productName}</p>
+        <p className="font-medium text-fg">{item.productName}{item.packLabel ? ` - ${item.packLabel}` : ''}<span className="block text-xs text-muted">{item.components?.map(c => `${c.productName} ? ${c.unitsPerPack}`).join(', ')}</span></p>
         <p className="text-xs text-muted">{item.sku}</p>
       </div>
     ),
@@ -87,7 +89,7 @@ function OrderDetailContent({ order, reload }: { order: OrderDetail; reload: () 
           </Card>
 
           <Card title="Items">
-            <DataTable caption="Order items" columns={ITEM_COLUMNS} rows={order.items} getKey={(item) => item.productId} />
+            <DataTable caption="Order items" columns={ITEM_COLUMNS} rows={order.items} getKey={(item) => item.id} />
             <dl className="mt-4 ml-auto w-full max-w-xs space-y-1.5 text-sm">
               <div className="flex justify-between">
                 <dt className="text-muted">Subtotal</dt>
@@ -124,6 +126,7 @@ function OrderDetailContent({ order, reload }: { order: OrderDetail; reload: () 
               ))}
             </ol>
           </Card>
+          <OrderReturnsPanel orderId={order.id} orderUpdatedAt={order.updatedAt} />
         </div>
 
         <div className="space-y-6">

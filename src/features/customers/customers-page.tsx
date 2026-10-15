@@ -33,6 +33,7 @@ const COLUMNS: Column<Customer>[] = [
   { key: 'value', header: 'Total purchases', align: 'right', cell: (customer) => formatCurrency(customer.totalOrderValuePaise) },
   { key: 'last', header: 'Last order', cell: (customer) => formatDateTime(customer.lastOrderAt) },
   { key: 'joined', header: 'Joined', cell: (customer) => formatDate(customer.createdAt) },
+  { key: 'actions', header: 'Actions', align: 'right', cell: customer => <Link href={`/customers/${customer.id}`}>View customer</Link> },
 ];
 
 export function CustomersPage() {

@@ -140,3 +140,6 @@ export const saveSettings = (changes: SettingsChanges) =>
 /** Sends a test email with the SAVED email settings. A failure carries a safe explanation. */
 export const sendTestEmail = (to?: string) =>
   apiRequest<{ sentTo: string }>('/settings/email/test', { method: 'POST', body: to ? { to } : {}, timeoutMs: 30_000 });
+
+export const createPack = (id:string, body:{label:string;sku:string;unitsPerPack:number;mrpPaise:number;sellingPricePaise:number;isActive:boolean}) => apiRequest('/products/'+encodeURIComponent(id)+'/packs',{method:'POST',body});
+export const updatePack = (id:string,packId:string,body:{label:string;sku:string;mrpPaise:number;sellingPricePaise:number;isActive:boolean}) => apiRequest('/products/'+encodeURIComponent(id)+'/packs/'+encodeURIComponent(packId),{method:'PATCH',body});

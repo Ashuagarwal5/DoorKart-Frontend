@@ -33,7 +33,9 @@ export function DataTable<T>({
   rowClassName?: (row: T) => string | undefined;
 }) {
   const [titleColumn, ...otherColumns] = columns;
-  const detailColumns = otherColumns.filter((column) => !column.hideOnCard);
+  const detailColumns = otherColumns.filter((column) => !column.hideOnCard && column.key !== 'actions');
+
+  const actions = columns.find(column => column.key === 'actions');
 
   return (
     <>
@@ -51,20 +53,21 @@ export function DataTable<T>({
                 </div>
               ))}
             </dl>
+            {actions && <div className="table-actions mt-4 flex flex-wrap justify-end gap-2 border-t border-line pt-3">{actions.cell(row)}</div>}
           </li>
         ))}
       </ul>
 
-      <div className="hidden overflow-x-auto rounded-xl border border-line bg-surface md:block">
+      <div role="region" aria-label={caption} tabIndex={0} className="hidden overflow-x-auto rounded-xl border border-line bg-surface shadow-sm md:block">
         <table className="w-full min-w-max text-left text-sm">
           <caption className="sr-only">{caption}</caption>
-          <thead className="border-b border-line bg-bg text-xs font-medium uppercase tracking-wide text-muted">
+          <thead className="border-b border-line bg-bg text-xs font-semibold uppercase tracking-wider text-muted">
             <tr>
               {columns.map((column) => (
                 <th
                   key={column.key}
                   scope="col"
-                  className={cn('px-4 py-3 font-medium', column.align === 'right' && 'text-right', column.className)}>
+                  className={cn('whitespace-nowrap px-5 py-4 font-semibold', column.align === 'right' && 'text-right', column.className)}>
                   {column.header}
                 </th>
               ))}
@@ -72,11 +75,11 @@ export function DataTable<T>({
           </thead>
           <tbody className="divide-y divide-line">
             {rows.map((row) => (
-              <tr key={getKey(row)} className={cn('hover:bg-bg/60', rowClassName?.(row))}>
+              <tr key={getKey(row)} className={cn('transition-colors hover:bg-primary-soft/25 focus-within:bg-primary-soft/25', rowClassName?.(row))}>
                 {columns.map((column) => (
                   <td
                     key={column.key}
-                    className={cn('px-4 py-3 align-middle', column.align === 'right' && 'text-right', column.className)}>
+                    className={cn('px-5 py-4 align-middle', column.key === 'actions' && 'table-actions', column.align === 'right' && 'tabular-nums', column.align === 'right' && 'text-right', column.className)}>
                     {column.cell(row)}
                   </td>
                 ))}

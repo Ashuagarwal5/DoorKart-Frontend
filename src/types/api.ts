@@ -65,6 +65,10 @@ export type OrderDetail = {
   };
   deliveryAreaId: string;
   items: {
+    id: string;
+    packLabel: string | null;
+    variantId: string | null;
+    components: {productId:string;productName:string;unitsPerPack:number}[];
     productId: string;
     productName: string;
     sku: string;
@@ -158,7 +162,11 @@ export type ProductMedia = {
 /** What the upload endpoint returns for a stored file. */
 export type UploadedMedia = { url: string; mediaType: MediaType; sizeBytes: number };
 
+export type PackVariant = {id:string;productId:string;label:string;sku:string;unitsPerPack:number;mrpPaise:number;sellingPricePaise:number;isActive:boolean;displayOrder:number;availableQuantity:number};
 export type Product = {
+  kind: 'STANDARD' | 'COMBO';
+  variants: PackVariant[];
+  comboComponents: {productId:string;quantity:number;productName:string;sku:string}[];
   id: string;
   name: string;
   slug: string;
@@ -184,6 +192,7 @@ export type Product = {
 };
 
 export type ProductListFilters = {
+  kind?: 'STANDARD' | 'COMBO';
   page?: number;
   limit?: number;
   /** Name or SKU. */
@@ -194,6 +203,8 @@ export type ProductListFilters = {
 };
 
 export type ProductCreateInput = {
+  kind?: 'STANDARD' | 'COMBO';
+  comboComponents?: {productId:string;quantity:number}[];
   name: string;
   /** Left out, the server derives it from the name. */
   slug?: string;
@@ -212,7 +223,7 @@ export type ProductCreateInput = {
 };
 
 /** Stock cannot be edited here: the server rejects `stockQuantity` on update. */
-export type ProductUpdateInput = Partial<Omit<ProductCreateInput, 'stockQuantity'>>;
+export type ProductUpdateInput = Partial<Omit<ProductCreateInput, 'stockQuantity' | 'kind'>>;
 
 export type InventoryAdjustmentInput = { quantityDelta: number; note: string };
 
@@ -312,7 +323,9 @@ export type SettingView = {
 export type SettingsView = {
   /** False when the server has no SECRETS_KEY, so a secret cannot be saved yet. */
   secretsKeyConfigured: boolean;
-  groups: { id: 'email' | 'google' | 'signin'; title: string; description: string; settings: SettingView[] }[];
+  /** Complete, readable saved SMTP configuration; delivery still needs a test email. */
+  smtpConfigured: boolean;
+  groups: { id: 'shop' | 'email' | 'google' | 'signin' | 'reviews'; title: string; description: string; settings: SettingView[] }[];
 };
 
 /** key to new value. null removes the saved value; a key left out is not changed. */

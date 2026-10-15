@@ -4,7 +4,7 @@ import { ADMIN_API_URL, API_CONFIG_ERROR, REQUEST_TIMEOUT_MS } from '@/services/
 type QueryValue = string | number | boolean | undefined | null;
 
 export type RequestOptions = {
-  method?: 'GET' | 'POST' | 'PATCH';
+  method?: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
   query?: Record<string, QueryValue>;
   /** JSON for ordinary requests, or FormData for a file upload. */
   body?: unknown;

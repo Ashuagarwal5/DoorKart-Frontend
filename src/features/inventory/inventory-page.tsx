@@ -26,6 +26,7 @@ export function InventoryPage() {
 
   const lowStockOnly = url.get('lowStock') === 'true';
   const filters: ProductListFilters = {
+    kind: 'STANDARD',
     page: url.page,
     limit: PAGE_SIZE,
     search: url.get('search') || undefined,

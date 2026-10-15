@@ -34,6 +34,7 @@ const RECENT_COLUMNS: Column<OrderListItem>[] = [
   { key: 'status', header: 'Status', cell: (order) => <OrderStatusBadge status={order.orderStatus} /> },
   { key: 'payment', header: 'Payment', cell: (order) => <PaymentStatusBadge status={order.paymentStatus} /> },
   { key: 'placed', header: 'Placed', cell: (order) => formatDateTime(order.createdAt) },
+  { key: 'actions', header: 'Actions', align: 'right', cell: order => <Link href={`/orders/${order.id}`}>View order</Link> },
 ];
 
 export function DashboardPage() {

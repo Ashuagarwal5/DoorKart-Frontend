@@ -71,7 +71,7 @@ export function ProductsPage() {
       header: 'Product',
       cell: (product) => (
         <Link href={`/products/${product.id}/edit`} className="font-medium text-primary hover:underline">
-          {product.name}
+          {product.name}<span className="block text-xs text-muted">{product.kind === 'COMBO' ? 'Combo pack' : product.variants?.length ? `${product.variants.length} quantity packs` : 'Single unit'}</span>
         </Link>
       ),
     },

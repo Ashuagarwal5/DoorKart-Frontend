@@ -1,6 +1,6 @@
 'use client';
 
-import { type FormEvent, useState } from 'react';
+import { type FormEvent, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import { CheckboxField, TextField } from '@/components/ui/field';
 import { QueryView, TableSkeleton } from '@/components/ui/states';
 import { useToast } from '@/components/ui/toast';
 import { useAdmin } from '@/features/auth/auth-context';
+import { useSectionScroll } from '@/hooks/use-section-scroll';
 import { useApiQuery } from '@/hooks/use-api-query';
 import { fetchSettings, saveSettings, sendTestEmail } from '@/services/api/admin-api';
 import { ApiError, describeApiError, type FieldErrors } from '@/services/api/api-error';
@@ -20,16 +21,20 @@ import type { SettingsChanges, SettingsView, SettingView } from '@/types/api';
  */
 export function AppSettings() {
   const admin = useAdmin();
-  const query = useApiQuery('settings', () => fetchSettings());
 
   if (admin.role !== 'SUPER_ADMIN') {
     return (
-      <Card title="Sign-in and email">
+      <Card title="Store settings">
         <p className="text-sm text-muted">Only a super admin can view or change these settings.</p>
       </Card>
     );
   }
 
+  return <SettingsQuery />;
+}
+
+function SettingsQuery() {
+  const query = useApiQuery('settings', () => fetchSettings());
   return (
     <QueryView query={query} skeleton={<TableSkeleton rows={4} />}>
       {(view) => <SettingsForm view={view} onSaved={query.reload} />}
@@ -64,6 +69,9 @@ function SettingsForm({ view, onSaved }: { view: SettingsView; onSaved: () => vo
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [activeGroup, setActiveGroup] = useState(view.groups[0]?.id ?? '');
+  const section = useRef<HTMLDivElement>(null);
+  useSectionScroll(activeGroup, section);
   const saved = initialState(view);
 
   const all = view.groups.flatMap((group) => group.settings);
@@ -83,6 +91,9 @@ function SettingsForm({ view, onSaved }: { view: SettingsView; onSaved: () => vo
   };
   const pending = changes();
   const hasChanges = Object.keys(pending).length > 0;
+  const registrationVerificationRequired =
+    state.values['auth.registrationOtpEnabled'] !== 'false' ||
+    state.values['auth.requireEmailVerification'] !== 'false';
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -101,6 +112,9 @@ function SettingsForm({ view, onSaved }: { view: SettingsView; onSaved: () => vo
       const apiError = error instanceof ApiError ? error : new ApiError('SERVER_ERROR', 'Something went wrong.');
       if (apiError.code === 'VALIDATION_ERROR' && Object.keys(apiError.fieldErrors).length > 0) {
         setErrors(apiError.fieldErrors);
+        setFormError('Please check the highlighted fields before saving. Your changes have been kept.');
+        const invalidGroup = view.groups.find(group => group.settings.some(setting => apiError.fieldErrors[setting.key]));
+        if (invalidGroup) setActiveGroup(invalidGroup.id);
       } else {
         setFormError(describeApiError(apiError));
       }
@@ -113,12 +127,24 @@ function SettingsForm({ view, onSaved }: { view: SettingsView; onSaved: () => vo
     <div className="space-y-6">
       {!view.secretsKeyConfigured ? (
         <p role="alert" className="rounded-lg bg-warning-soft px-4 py-3 text-sm text-warning">
-          The server has no <code>SECRETS_KEY</code>, so a password cannot be saved and customers cannot sign in with an
+          The server has no <code>SECRETS_KEY</code>, so an SMTP password cannot be saved and customers cannot sign in with an
           email code yet. In the Backend folder run <code>npm run secrets:key</code>, put the line it prints into{' '}
           <code>Backend/.env</code>, and restart the API.
         </p>
       ) : null}
 
+      <div ref={section} className="grid items-start gap-6 xl:grid-cols-[240px_minmax(0,1fr)]">
+      <nav aria-label="Settings categories" className="flex flex-wrap gap-2 rounded-xl border border-line bg-surface p-3 xl:sticky xl:top-24 xl:flex-col">
+        {view.groups.map(group => {
+          const changed = group.settings.filter(setting => Object.hasOwn(pending, setting.key)).length;
+          const invalid = group.settings.some(setting => errors[setting.key]);
+          return <button key={group.id} type="button" aria-pressed={activeGroup === group.id} onClick={() => setActiveGroup(group.id)}
+            className={`flex items-center justify-between gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium ${activeGroup === group.id ? 'bg-primary-soft text-primary' : 'text-muted hover:bg-bg'}`}>
+            {group.title}{invalid ? <span className="text-danger">Check fields</span> : changed > 0 ? <span className="rounded-full bg-primary px-2 text-xs text-white" aria-label={`${changed} unsaved changes`}>{changed}</span> : null}
+          </button>;
+        })}
+      </nav>
+      <div className="min-w-0 space-y-6">
       <form onSubmit={submit} noValidate className="space-y-6">
         {formError ? (
           <p role="alert" className="rounded-lg bg-danger-soft px-4 py-3 text-sm text-danger">
@@ -126,10 +152,33 @@ function SettingsForm({ view, onSaved }: { view: SettingsView; onSaved: () => vo
           </p>
         ) : null}
 
-        {view.groups.map((group) => (
+        {view.groups.filter(group => group.id === activeGroup).map((group) => (
           <Card key={group.id} title={group.title}>
             <p className="mb-4 text-sm text-muted">{group.description}</p>
-            <div className="space-y-4">
+            {group.id === 'signin' ? (
+              <div className="mb-4 space-y-2 rounded-lg bg-bg px-3 py-3 text-sm text-muted">
+                <p>Email login always requires a one-time email code, regardless of registration settings.</p>
+                <p>
+                  {registrationVerificationRequired
+                    ? 'With these settings, customers must verify their email to complete registration.'
+                    : 'With these settings, customers can register an unverified account. They must verify an email login code before signing in.'}
+                </p>
+              </div>
+            ) : null}
+            {group.id === 'email' ? (
+              <div
+                role="status"
+                className={`mb-4 rounded-lg px-3 py-3 text-sm ${view.smtpConfigured ? 'bg-success-soft text-success' : 'bg-warning-soft text-warning'}`}>
+                <p className="font-medium">SMTP configuration: {view.smtpConfigured ? 'Configured' : 'Not configured'}</p>
+                <p className="mt-1">
+                  {view.smtpConfigured
+                    ? 'The saved configuration is complete. Send a test email below to verify delivery.'
+                    : 'Save complete email server settings to enable email-code registration and login.'}
+                </p>
+                {hasChanges ? <p className="mt-1">This status reflects saved settings. Save your changes to update it.</p> : null}
+              </div>
+            ) : null}
+            <div className="grid items-start gap-5 md:grid-cols-2">
               {group.settings.map((setting) => (
                 <SettingField
                   key={setting.key}
@@ -145,15 +194,17 @@ function SettingsForm({ view, onSaved }: { view: SettingsView; onSaved: () => vo
           </Card>
         ))}
 
-        <div className="flex items-center gap-3">
+        <div className="sticky bottom-4 z-10 flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface p-4 shadow-lg">
           <Button type="submit" variant="primary" loading={isSaving} disabled={!hasChanges}>
-            Save settings
+            Save all changes
           </Button>
           {hasChanges ? <span className="text-sm text-muted">You have unsaved changes.</span> : null}
         </div>
       </form>
 
-      <TestEmail hasUnsavedChanges={hasChanges} />
+      {activeGroup === 'email' && <TestEmail hasUnsavedChanges={hasChanges} />}
+      </div>
+      </div>
     </div>
   );
 }
@@ -177,6 +228,7 @@ function SettingField({
 
   if (setting.type === 'boolean') {
     return (
+      <div className="rounded-lg border border-line bg-bg/50 p-4">
       <CheckboxField
         label={setting.label}
         hint={setting.description ?? undefined}
@@ -186,6 +238,8 @@ function SettingField({
           setState((current) => ({ ...current, values: { ...current.values, [key]: String(event.target.checked) } }))
         }
       />
+      {error && <p role="alert" className="mt-2 text-xs text-danger">{error}</p>}
+      </div>
     );
   }
 

@@ -2,6 +2,7 @@ import { cn } from '@/utils/cn';
 
 /** Simple outline icons, drawn inline so the panel needs no icon library. */
 const PATHS = {
+  chevronDown: 'M6 9l6 6 6-6',
   menu: 'M4 6h16M4 12h16M4 18h16',
   close: 'M6 6l12 12M18 6L6 18',
   dashboard: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z',
@@ -16,6 +17,7 @@ const PATHS = {
   settings: 'M4 7h10M18 7h2M4 17h2M10 17h10M16 4v6M8 14v6',
   logout: 'M9 4H5v16h4M16 8l4 4-4 4M20 12H9',
   search: 'M11 4a7 7 0 100 14 7 7 0 000-14zM20 20l-4-4',
+  bell: 'M6 9a6 6 0 1112 0c0 5 2 6 2 7H4c0-1 2-2 2-7zM10 20a2 2 0 004 0',
 } as const;
 
 export type IconName = keyof typeof PATHS;
