@@ -1,0 +1,25 @@
+# Admin panel only. Use this when the admin frontend is deployed on its own and the backend
+# runs elsewhere (for example https://api.doorkart.in). The repository-root compose.yaml
+# starts the database, API and admin panel together instead.
+#
+#   cp .env.docker.example .env.docker      # then edit it
+#   npm run docker:up
+name: doorkart-admin
+
+services:
+  frontend:
+    build:
+      context: .
+      args:
+        # Next.js resolves the backend proxy address while building. Rebuild after changing it.
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:?Set NEXT_PUBLIC_API_BASE_URL in .env.docker}
+    restart: unless-stopped
+    init: true
+    ports:
+      - "${ADMIN_PORT:-3000}:3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/login').then(r=>process.exit(r.status<500?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      start_period: 20s
+      retries: 10

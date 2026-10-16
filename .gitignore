@@ -33,6 +33,7 @@ yarn-error.log*
 # env files: real values stay out of Git, the example is committed
 .env*
 !.env.example
+!.env.docker.example
 
 # vercel
 .vercel
