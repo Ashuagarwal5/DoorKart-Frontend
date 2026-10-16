@@ -39,10 +39,10 @@ export function ProfilePage() {
         {process.env.NODE_ENV !== 'production' ? (
           <Card title="Development">
             <dl className="space-y-3">
-              <DetailRow label="Backend address">{API_BASE_URL || 'Not set'}</DetailRow>
+              <DetailRow label="Backend connection">{API_BASE_URL || 'Same-origin proxy'}</DetailRow>
             </dl>
             <p className="mt-3 text-xs text-muted">
-              Set by NEXT_PUBLIC_API_BASE_URL. The backend&apos;s CORS_ORIGINS must include this panel&apos;s address.
+              Next.js proxies requests to NEXT_PUBLIC_API_BASE_URL. The backend&apos;s CORS_ORIGINS must include this panel&apos;s address.
             </p>
           </Card>
         ) : null}

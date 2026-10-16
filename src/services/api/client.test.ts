@@ -28,7 +28,8 @@ describe('apiRequest', () => {
     expect(data).toEqual({ ok: 1 });
     const [url, init] = fetchMock.mock.calls[0] ?? [];
     expect(init?.credentials).toBe('include');
-    const search = new URL(String(url)).searchParams;
+    expect(String(url)).toBe('/api/v1/admin/orders?page=2&status=PLACED&flag=false');
+    const search = new URL(String(url), 'http://admin.test').searchParams;
     expect(search.get('page')).toBe('2');
     expect(search.get('status')).toBe('PLACED');
     expect(search.get('flag')).toBe('false');

@@ -3,7 +3,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-# Next.js embeds public variables in the browser bundle during the build.
+# Next.js resolves the backend proxy destination during the build.
 ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:4000
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL NEXT_TELEMETRY_DISABLED=1
 RUN npm run build

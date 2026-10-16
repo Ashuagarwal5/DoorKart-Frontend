@@ -25,14 +25,15 @@ export function setUnauthorizedHandler(handler: (() => void) | null): void {
 }
 
 function buildUrl(path: string, query: RequestOptions['query']): string {
-  const url = new URL(`${ADMIN_API_URL}${path}`);
+  const queryParams = new URLSearchParams();
   for (const [key, value] of Object.entries(query ?? {})) {
     // Empty values are left out entirely, so "no filter" never reaches the server as "".
     if (value !== undefined && value !== null && value !== '') {
-      url.searchParams.set(key, String(value));
+      queryParams.set(key, String(value));
     }
   }
-  return url.toString();
+  const search = queryParams.toString();
+  return `${ADMIN_API_URL}${path}${search ? `?${search}` : ''}`;
 }
 
 /**
