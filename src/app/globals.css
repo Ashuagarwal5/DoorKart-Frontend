@@ -74,3 +74,11 @@ dialog::backdrop {
 
 /* Tab contents and loading tables must not anchor the viewport to bottom actions. */
 #main-content { overflow-anchor: none; }
+
+/* Form fields show focus with a darker border instead of an outline ring. */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+}
